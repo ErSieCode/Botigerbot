@@ -1,0 +1,20 @@
+crypto_trading_bot/
+├── backend/            # Elixir application
+│   ├── lib/
+│   │   ├── crypto_bot/
+│   │   │   ├── exchanges/   # Exchange API connections
+│   │   │   ├── strategies/  # Trading strategies 
+│   │   │   ├── indicators/  # Technical indicators
+│   │   │   └── traders/     # Trading execution
+│   │   └── crypto_bot_web/  # Phoenix web framework
+│   ├── config/          # Configuration files
+│   └── mix.exs          # Dependencies
+│
+└── frontend/          # Svelte application
+    ├── src/
+    │   ├── components/  # UI components
+    │   ├── routes/      # App pages
+    │   ├── stores/      # State management
+    │   ├── utils/       # Helper functions
+    │   └── App.svelte   # Main component
+    └── package.json     # Dependencies
