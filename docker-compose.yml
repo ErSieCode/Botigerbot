@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: crypto_user
+      POSTGRES_PASSWORD: crypto_password
+      POSTGRES_DB: crypto_bot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crypto_user -d crypto_bot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Elixir/Phoenix)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://crypto_user:crypto_password@db:5432/crypto_bot
+      PORT: 4000
+      SECRET_KEY_BASE: VDZfDGrATq/j6tdz5/WqgNlQFQsqrOeUdxu5+xuyQy3RG8Vo3wIMuA2/cu9Le4jK
+      GUARDIAN_SECRET_KEY: zMZ9SjpwmKvRJ2Z8JUBp7PpMZMTiMT1YJSjE10GV4H5GQX6Y+PcYRVCYiWLTYz2Z
+      API_KEY_ENCRYPTION_KEY: BPcPE40HrwALRGPGORNbSjrUvuxoUSqe
+      BITGET_API_KEY: your_api_key
+      BITGET_API_SECRET: your_api_secret
+      BITGET_PASSPHRASE: your_passphrase
+    ports:
+      - "4000:4000"
+
+  # Frontend (Svelte)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:4000/api
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres_data:
